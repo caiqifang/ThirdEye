@@ -8,7 +8,7 @@
         <meta name="description" content="Project ThirdEye">
         <meta name="author" content="Team 7">
 
-        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
 
         <!--[if lt IE 9]>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -16,7 +16,13 @@
     </head>
 
     <body>
-        <script src="js/scripts.js"></script>
+        <script type="text/javascript" src="../static/js/scripts.js"></script>
+        <script type="text/javascript" src="../static/js/fabric.min.js"></script>
+        <script src="../static/set.json"></script>
+        <script src="../static/data.json"></script>
+        <script src="../static/node_modules/self-reload-json/index.js"></script>
+        <script src="../static/node_modules/self-reload-json/package.json"></script>
+        <script src="../static/js/require.js"></script>
         <h1>Project ThirdEye</h1>
             <button id="area">
                 Set Area
@@ -28,8 +34,8 @@
                 Start
             </button>
 
-        <canvas id="myCanvas" width="800" height="600"
-                style="border:1px solid #000000; background-color:#FFFFFF">
+        <canvas id="main" width="800" height="600"
+                style="border:1px solid #000000">
         </canvas>
     </body>
 </html>
