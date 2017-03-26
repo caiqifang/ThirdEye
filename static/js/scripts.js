@@ -48,18 +48,19 @@ window.onload = function(){
     canvas.add(tri3);
 
     // refresh
-    setInterval(draw, 3000);
+    setInterval(draw, 500);
 
     // drawing function
     function draw(){
-        // load
-        loadJSON("../static/data.json", load_data);
+        // load -  breaking the cache
+        loadJSON("../static/data.json" + "?t=" + Math.random(), load_data);
 
         if(json_data.x > -1){
             // reset positions
             rect.set({ left: json_data.x, top: json_data.y });
         }
         canvas.renderAll()
+        postJSON("../static/data.json" + "?t=" + Math.random());
     }
 
     // loading
@@ -75,6 +76,20 @@ window.onload = function(){
       };
       xobj.open("GET", file, true);
       xobj.send();
+    }
+
+    function postJSON(file){
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", file, true);
+        //xhr.setRequestHeader("Content-type", "application/json");
+        //xhr.onreadystatechange = function () {
+        //    if (this.readyState == 4 && this.status == 200) {
+        //        var json = JSON.parse(this.responseText);
+        //    }
+        //}
+        var data = JSON.stringify({ "x" : Math.random()*800,
+                                     "y" : Math.random()*600 });
+        xhr.send(data);
     }
 
     function load_data(obj){
