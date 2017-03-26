@@ -48,7 +48,7 @@ window.onload = function(){
     canvas.add(tri3);
 
     // refresh
-    setInterval(draw, 500);
+    setInterval(draw,  100);
 
     // drawing function
     function draw(){
@@ -57,45 +57,50 @@ window.onload = function(){
 
         if(json_data.x > -1){
             // reset positions
-            rect.set({ left: json_data.x, top: json_data.y });
+            rect.set({ left: Math.round(json_data.x),
+                        top: Math.round(json_data.y) });
         }
         canvas.renderAll()
-        postJSON("../static/data.json" + "?t=" + Math.random());
+        postJSON("/data", new_data);
     }
 
     // loading
     function loadJSON(file, callback){
-      var xobj = new XMLHttpRequest();
-      //xobj.overrideMimeType("application/json");
-      xobj.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == "200") {
+        var xobj = new XMLHttpRequest();
+        //xobj.overrideMimeType("application/json");
+        xobj.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == "200") {
         // Required use of an anonymous callback as .open will NOT return a
         // //value but simply returns undefined in asynchronous mode
-            callback(this);
-        }
-      };
-      xobj.open("GET", file, true);
-      xobj.send();
+                callback(this);
+            }
+        };
+        xobj.open("GET", file, true);
+        xobj.send();
     }
 
-    function postJSON(file){
+    function postJSON(file, callback){
         var xhr = new XMLHttpRequest();
         xhr.open("POST", file, true);
-        //xhr.setRequestHeader("Content-type", "application/json");
-        //xhr.onreadystatechange = function () {
-        //    if (this.readyState == 4 && this.status == 200) {
-        //        var json = JSON.parse(this.responseText);
+        xhr.setRequestHeader("Content-type", "application/json");
+        //xhr.onreadystatechange = function() {
+        //    if(xhr.readyState == 4 && xhr.status == 200) {
+        //            alert(xhr.responseText);
         //    }
         //}
-        var data = JSON.stringify({ "x" : Math.random()*800,
-                                     "y" : Math.random()*600 });
+        var data = callback();
         xhr.send(data);
     }
 
+    // Callback function
     function load_data(obj){
         var json_real = JSON.parse(obj.responseText);
         json_data.x = json_real.x;
         json_data.y = json_real.y;
     }
 
+    function new_data(){
+        return JSON.stringify({ "x" : Math.random()*800,
+                                "y" : Math.random()*600 });
+    }
 }
