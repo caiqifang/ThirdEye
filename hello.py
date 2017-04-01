@@ -16,6 +16,16 @@ def new_data():
         wr.write(json.dumps(j))
     return "Record New Data"
 
+@app.route("/set", methods=['GET', 'POST'])
+def new_set():
+    if request.method == 'POST':
+        curr_path = os.getcwd()
+        j = json.loads(request.data)
+        data_path = "/static/set.json"
+        wr = open(curr_path + data_path, 'w')
+        wr.write(json.dump(j))
+    return "Record New Data"
+
 
 if __name__ == "__main__":
     app.run()
