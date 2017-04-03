@@ -23,9 +23,19 @@ def new_set():
         j = json.loads(request.data)
         data_path = "/static/set.json"
         wr = open(curr_path + data_path, 'w')
-        wr.write(json.dump(j))
-    return "Record New Data"
+        wr.write(json.dumps(j))
+        print json.dumps(j)
+    return "Record New set"
 
+@app.route("/area", methods=['GET', 'POST'])
+def new_area():
+    if request.method == 'POST':
+        curr_path = os.getcwd()
+        j = json.loads(request.data)
+        data_path = "/static/area.json"
+        wr = open(curr_path + data_path, 'w')
+        wr.write(json.dumps(j))
+    return "Record new area"
 
 if __name__ == "__main__":
     app.run()
