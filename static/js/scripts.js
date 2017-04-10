@@ -32,11 +32,11 @@ window.onload = function(){
     // background image
     var imgElement = document.getElementById('my-image');
     var imgInstance = new fabric.Image(imgElement, {
-            opacity: 0.85,
-            hasControls: false,
-            lockMovementY: true,
-            lockMovementX: true,
-            selectable: false
+        opacity: 0.85,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        selectable: false
     });
 
     // create a rectangle object - > your position
@@ -45,7 +45,7 @@ window.onload = function(){
         originX:'center',
         left: json_data.x,
         top: json_data.y,
-        fill: 'red',
+        fill: 'yellow',
         width: 5,
         height: 5,
         lockScalingX: true,
@@ -55,7 +55,7 @@ window.onload = function(){
     if(json_set.anchors_list.length == 0){
         // create anchors
         json_set.anchors_list.push( new fabric.Triangle({
-            width: 5, height: 5, fill: 'blue', left: 700, top: 550,
+            width: 5, height: 5, fill: 'red', left: 500, top: 550,
             originY: 'center',
             originX: 'center',
             lockScalingX: true,
@@ -63,7 +63,7 @@ window.onload = function(){
         }));
 
         json_set.anchors_list.push( new fabric.Triangle({
-            width: 5, height: 5, fill: 'blue', left: 750, top: 550,
+            width: 5, height: 5, fill: 'green', left: 650, top: 550,
             originY: 'center',
             originX: 'center',
             lockScalingX: true,
@@ -71,7 +71,7 @@ window.onload = function(){
         }));
 
         json_set.anchors_list.push( new fabric.Triangle({
-            width: 5, height: 5, fill: 'blue', left:650, top: 550,
+            width: 5, height: 5, fill: 'blue', left:750, top: 550,
             originY: 'center',
             originX: 'center',
             lockScalingX: true,
@@ -94,7 +94,7 @@ window.onload = function(){
     canvas.add(tag);
 
     // refresh
-    setInterval(draw,  500);  // unit: ms
+    setInterval(draw,  200);  // unit: ms
 
     // drawing function
     function draw(){
@@ -105,9 +105,8 @@ window.onload = function(){
             if(json_data.x > -1){
                 // reset positions
                 tag.set({ left: Math.round(json_data.x),
-                            top: Math.round(json_data.y) });
+                    top: Math.round(json_data.y) });
             }
-            postJSON('/data', new_data);
             canvas.renderAll()
         }
     }
@@ -118,8 +117,8 @@ window.onload = function(){
         //xobj.overrideMimeType('application/json');
         xobj.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == '200') {
-        // Required use of an anonymous callback as .open will NOT return a
-        // //value but simply returns undefined in asynchronous mode
+                // Required use of an anonymous callback as .open will NOT return a
+                // //value but simply returns undefined in asynchronous mode
                 callback(this);
             }
         };
@@ -164,10 +163,10 @@ window.onload = function(){
 
     // ==============   POST CALLBACK ===========
     function new_data(){
-        return JSON.stringify({
-            'x':  Math.random()*json_set.max_width + json_set.bound_left,
-            'y':  Math.random()*json_set.max_height + json_set.bound_top
-        });
+        //  return JSON.stringify({
+        //     'x':  Math.random()*json_set.max_width + json_set.bound_left,
+        //      'y':  Math.random()*json_set.max_height + json_set.bound_top
+        // });
     }
 
     function new_set(){
