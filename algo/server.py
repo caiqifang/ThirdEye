@@ -40,21 +40,25 @@ def generate_matrix(num_device):
                 random.random()*max_bound[1] + corner[1])
         start = True
     else:
-        point = (point[0], corner[1] + (point[1] - corner[1] + 1) % max_bound[1])
+        point = (corner[0] + (point[0] - corner[0] + 1) % max_bound[0],
+                corner[1] + (point[1] - corner[1] + 1) % max_bound[1])
     print point
     matrix = np.zeros(num_device * num_device)
     matrix = matrix.reshape(num_device, num_device)
+    for i in range(num_device-1):
+        print i, 'beacons:', (obj['anchors_list'][i]['left'],
+                                obj['anchors_list'][i]['top'])
     for i in range(num_device-1):
         for j in range(num_device-1):
             matrix[i][j] = calc_dis(obj['anchors_list'][i]['left'],
                     obj['anchors_list'][i]['top'],
                     obj['anchors_list'][j]['left'],
                     obj['anchors_list'][j]['top'])
-            for i in range(num_device - 1):
-                dis = calc_dis(obj['anchors_list'][i]['left'],
+    for i in range(num_device - 1):
+        dis = calc_dis(obj['anchors_list'][i]['left'],
                         obj['anchors_list'][i]['top'],
                         point[0], point[1])
-                matrix[i][num_device-1] = dis
+        matrix[i][num_device-1] = dis
         matrix[num_device -1][i] = dis
     return matrix
 
