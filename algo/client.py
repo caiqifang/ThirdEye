@@ -58,6 +58,7 @@ def locate(d_matrix, obj):
     #print ini
     error = calc_error(num_device, matrix, obj, ini)
     step = 10
+    cnt = 0
     while (error > 1):
         # choose x y to improve
         vector = (0,0)
@@ -83,6 +84,9 @@ def locate(d_matrix, obj):
         #print 'point', ini
         error = calc_error(num_device, matrix, obj, ini)
         #print 'error', error
+        cnt = cnt +1
+        if cnt > 150:
+            break
     return ini, error
 
 def main():
