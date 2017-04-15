@@ -110,5 +110,53 @@ def main():
         # delay
         time.sleep(0.5)
 
+
+def generate_matrix(num_device):
+    global start
+    global point
+    obj = load_json(set_path)
+    corner = (obj['bound_left'], obj['bound_top'])
+    max_bound = (obj['max_width'], obj['max_height'])
+
+    if (not start):
+        point = (random.random()*max_bound[0] + corner[0],
+                random.random()*max_bound[1] + corner[1])
+        start = True
+    else:
+        point = (corner[0] + (point[0] - corner[0] + 1) % max_bound[0],
+                corner[1] + (point[1] - corner[1] + 1) % max_bound[1])
+    print point
+    matrix = np.zeros(num_device * num_device)
+    matrix = matrix.reshape(num_device, num_device)
+    for i in range(num_device-1):
+        print i, 'beacons:', (obj['anchors_list'][i]['left'],
+                                obj['anchors_list'][i]['top'])
+    for i in range(num_device-1):
+        for j in range(num_device-1):
+            matrix[i][j] = calc_dis(obj['anchors_list'][i]['left'],
+                    obj['anchors_list'][i]['top'],
+                    obj['anchors_list'][j]['left'],
+                    obj['anchors_list'][j]['top'])
+    for i in range(num_device - 1):
+        dis = calc_dis(obj['anchors_list'][i]['left'],
+                        obj['anchors_list'][i]['top'],
+                        point[0], point[1])
+        matrix[i][num_device-1] = dis
+        matrix[num_device -1][i] = dis
+    return matrix
+
+def call_driver(num_device):
+    client = socket.socket()
+    host = 'localhost'
+    port = 1024
+    client.connect((host,port))
+    client.send(str(num_device))
+    msg = client.recv(1024)
+    client.close()
+    return msg
+
+
+
+
 if __name__ == '__main__':
     main()
