@@ -38,6 +38,14 @@ window.onload = function(){
         lockMovementX: true,
         selectable: false
     });
+    imgInstance.set({
+        top: 0,
+        left: 0,
+        scaleY: canvas.height / imgInstance.height,
+        scaleX: canvas.width / imgInstance.width
+    });
+
+
 
     // create a rectangle object - > your position
     var tag = new fabric.Rect({
