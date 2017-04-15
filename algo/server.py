@@ -81,12 +81,23 @@ def main():
         # random point
         matrix = generate_matrix(num_device) #np.matrix(m)
         matrix = matrix.astype(float)
+        call_driver(num_device)
         print matrix
         msg = matrix.tostring()
         c.send(msg)
         c.close()
     # should never get here
     server.close()
+
+def call_driver(num_device):
+    client = socket.socket()
+    host = 'localhost'
+    port = 1024
+    client.connect((host,port))
+    client.send(str(num_device))
+    msg = client.recv(1024)
+    client.close()
+    return msg
 
 if __name__ == '__main__':
     main()
