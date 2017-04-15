@@ -74,16 +74,15 @@ def main():
         print 'Got connection from', addr
         client_msg = c.recv(1024)
         print 'Message:' , client_msg
-        num_device = int(client_msg)
+        # num_device = int(client_msg)
         # pull distance information
         #m = '0 1 2 1.1547;1 0 1.7321 0.57735; \
                 #2 1.7321 0 1.1547;1.1547 0.57735 1.1547 0'
         # random point
-        matrix = generate_matrix(num_device) #np.matrix(m)
-        matrix = matrix.astype(float)
-        call_driver(num_device)
-        print matrix
-        msg = matrix.tostring()
+        #matrix = generate_matrix(num_device) #np.matrix(m)
+        #matrix = matrix.astype(float)
+        #call_driver(num_device)
+        msg = " SERVER REPLY" #matrix.tostring()
         c.send(msg)
         c.close()
     # should never get here
