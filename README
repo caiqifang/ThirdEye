@@ -1,3 +1,6 @@
+User Interface
+--------------
+
 PATH:
 ~/project/ThirdEye
 
@@ -31,3 +34,14 @@ Using any device connect to the router's WIFI:
 
 ssh pi@192.168.0.100
 password: pi
+
+
+DecaWave Code
+-------------
+
+1 tag 4 beacon code: dw1000_api_rev2p03/examples/myRanging/
+
+Use Makefile to compile
+
+RPi specific code: dw1000_api_rev2p03/myPlatform
+
