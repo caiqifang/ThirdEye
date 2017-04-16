@@ -1,5 +1,5 @@
 .swp
 .pyc
 .DS_Store
-a.out
+*.out
 
