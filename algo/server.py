@@ -1,5 +1,5 @@
 #!/usr/bin/python           # This is server.py file
-import socket               # Import socket module
+import socket
 import time, json, os, random, math, sys
 import numpy as np
 
@@ -64,6 +64,7 @@ def locate(d_matrix, obj):
             break
     return ini, error
 
+# ============ FILE IO
 def load_json(path):
     curr_path = os.getcwd()
     rd = open(curr_path + path, 'r')
@@ -79,47 +80,35 @@ def write_json(path, msg):
     wr.close()
     return
 
+# =====================  COMMAND PARSING
+def
+
+
+
 def main():
     server = socket.socket()         # Create a socket object
     server.bind((host, port))        # Bind to the port
     server.listen(5)                 # Now wait for client connection.
-    num_device = 4
+    status = {}                      # system status
     while True:
         c, addr = server.accept()     # Establish connection with client.
-        print 'Got connection from', addr
+        print 'Got connection from', addr, time.ctime()
         client_msg = c.recv(1024)
         print 'Message:' , client_msg
-        # num_device = int(client_msg)
-        # pull distance information
+        # ============ parse client message
+
         # localization calculation ==========
         #print d_matrix
-        obj = load_json(set_path)
-        ret, err =  locate(d_matrix, obj)        # return (x, y) pixal location
-        print ret
-        print err
+        #obj = load_json(set_path) # load setting
+        #ret, err =  locate(d_matrix, obj)        # return (x, y) pixal location
         # write to data.json
-        write_json(data_path, ret)
-        # delay
-        time.sleep(0.5)
-
-
+        #write_json(data_path, ret)
 
         msg = "SERVER REPLY"
         c.send(msg)
         c.close()
     # should never get here
     server.close()
-
-        # localization calculation ==========
-        #print d_matrix
-        obj = load_json(set_path)
-        ret, err =  locate(d_matrix, obj)        # return (x, y) pixal location
-        print ret
-        print err
-        # write to data.json
-        write_json(data_path, ret)
-        # delay
-        time.sleep(0.5)
 
 if __name__ == '__main__':
     main()

@@ -65,9 +65,10 @@ int main(int argc, char *argv[])
 {
     char *buffer;
     buffer = (char *) malloc(MAX_SIZE);
-    // TODO: while(1){}
-    pull_info(buffer);
-    send_info(buffer, argc, argv);
+    while(1){
+        pull_info(buffer);
+        send_info(buffer, argc, argv);
+    }
     free(buffer);
 }
 
