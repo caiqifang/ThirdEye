@@ -61,6 +61,7 @@ Valid:Type:TagNum:BeaconNum:pointA:pointB:Value
     Valid -> valid bit to verify transmission, only valid number int(777)
     Type -> int 0 represent beacon to beacon distance
             int 5 represent beacon to tag distance
+            int 9 system reset
     TagNum -> total number of tags in the field
     BeaconNum -> total number of beacons in the field
     Point A -> Id of first decawave

@@ -1,7 +1,6 @@
 #!/usr/bin/python           # This is server.py file
 import socket
 import time, json, os, random, math, sys
-import numpy as np
 
 area_path = '/../static/area.json'
 set_path = '/../static/set.json'
@@ -13,25 +12,25 @@ def calc_dis(x1, y1, x2, y2):
     ans = math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)
     return math.sqrt(ans)
 
-def calc_error(num_device, num_tag, dmatrix, setting, point):
+def sign(v):
+    if v >= 0.0:
+        return 1
+    return -1
+
+def calc_error(num_device, num_tag, dmatrix, point, i, obj):
     e = 0
-    for i in range(num_device -1):  # if more tags,  change HERE!
-        cal_dis = calc_dis(obj['anchors_list'][i]['left'],
-                         obj['anchors_list'][i]['top'], ini[0], ini[1])
-        e = e + (cal_dis - matrix[num_device-1][i])**2
+    for d in range(num_tag, num_tag + num_device):
+        cal_dis = calc_dis(obj['anchors_list'][d]['left'],
+                         obj['anchors_list'][d]['top'], point[0], point[1])
+        e = e + (cal_dis - dmatrix[i][d])**2
     return e
 
-def locate(result, setting, status):
-    scale = calc_dis(obj['anchors_list'][0]['left'],
-                     obj['anchors_list'][0]['top'],
-                     obj['anchors_list'][1]['left'],
-                     obj['anchors_list'][1]['top']) / d_matrix[0][1]
-    matrix = d_matrix * scale
-    corner = (obj['bound_left'], obj['bound_top'])
-    max_bound = (obj['max_width'], obj['max_height'])
-    ini = (random.random()*max_bound[0] + corner[0],
-            random.random()*max_bound[1] + corner[1])
-    error = calc_error(num_device, matrix, obj, ini)
+def find_point(result, status, point, i):
+    p = point
+    num_device = result['num_device']
+    num_tag = result['num_tag']
+    matrix = result['distance']
+    error = calc_error(num_device, num_tag, matrix, p, i)
     step = 10
     cnt = 0
     while (error > 1):
@@ -39,31 +38,45 @@ def locate(result, setting, status):
         vector = (0,0)
         if random.random() > 0.5:
             vector = (step, 0)
-            #print 'x'
         else:
             vector = (0, step)
-            #print 'y'
-        ini_p = (ini[0] + vector[0], ini[1] + vector[1])
+        point_p = (p[0] + vector[0], p[1] + vector[1])
         # calculate gradiant
-        err_change = (calc_error(num_device, matrix, obj, ini_p) - error) / step
-        #print 'err_change', err_change
+        err_change = (calc_error(num_device, num_tag, matrix, point_p, i) \
+                            - error) / step
         # choose step size
-        step = math.sqrt(abs(err_change)) #2 pixel step
-        #print 'step', step
+        step = math.sqrt(abs(err_change))
         # update (x,y) point
         if vector[0] > 0:
-            ini = (ini[0] - step*np.sign(err_change), ini[1])
+            p = (p[0] - step*sign(err_change), p[1])
         else:
-            ini = (ini[0], ini[1] - step*np.sign(err_change))
+            p = (p[0], p[1] - step*sign(err_change))
         # update improve
-        #print 'point', ini
-        error = calc_error(num_device, matrix, obj, ini)
-        #print 'error', error
+        error = calc_error(num_device, num_tag, matrix, p, i)
         cnt = cnt +1
-        if cnt > 150:
+        if cnt > 100:
             break
-    # return (x, y) pixal location
-    return ini, error
+    return p
+
+def locate(result, status):
+    num_device = result['num_device']
+    num_tag = result['num_tag']
+    point = []
+    if status['last_point'] = None:
+        #first start
+        corner = (status['setting']['bound_left'], status['setting']['bound_top'])
+        max_bound =(status['setting']['max_width'], status['setting']['max_height'])
+        for i in num_tag:
+            point.append((random.random()*max_bound[0] + corner[0],
+                            random.random()*max_bound[1] + corner[1]))
+    else:
+        point = status['last_point']
+
+    for i in num_tag:
+        point[i] = find_point(result, status, point[i], i)
+
+    status['last_point'] = point
+    return point
 
 # ============ FILE IO
 def load_json(path):
@@ -73,23 +86,45 @@ def load_json(path):
     rd.close()
     return json.loads(string)
 
-def write_json(path, msg):
-    # input: msg is a (x,y) tuple
+def write_json(path, pts):
+    # input: pts is a list of (x,y) tuple   [(x,y), (x,y)]
     curr_path = os.getcwd()
     wr = open(curr_path + path, 'w')
-    data = {'x': msg[0], 'y': msg[1]}
+    data = {}
+    for i in len(pts):
+        data[i] = pts[i]
     wr.write(json.dumps(data))
     wr.close()
     return
 
-# =====================  COMMAND PARSING
+# =====================  COMMAND PARSING  TODO
 def parse(msg, status):
+    result['num_device'] = None
+    result['num_tag'] = None
+    result['distance'] = None
+
+    #parsing beacon to beacon
+    scale = calc_dis(obj['anchors_list'][0]['left'],
+                     obj['anchors_list'][0]['top'],
+                     obj['anchors_list'][1]['left'],
+                     obj['anchors_list'][1]['top']) / d_matrix[0][1]
+        # get scale
+
+    #parsing beacon to tag
+        # get distance matrix
+
+    #parsing reset
+    valid = False
     ret = {}
-    return ret
+    return valid, ret
+
+# ==================  TODO detect area
+
+def isInArea(status, points):
+
+    pass
 
 def reset(status):
-    status['num_beacon'] = None
-    status['num_device'] = None
     status['last_point'] = None
     status['scale'] = None
     status['reset'] = True
@@ -112,17 +147,19 @@ def main():
         valid, result = parse(client_msg, status)
         # localization calculation ==========
         if status['reset']:
-            status['setting'] = load_json(set_path) # load setting
+            reset(status)
+            status['setting'] = load_json(set_path)
+            status['area'] = load_json(area_path)
             status['reset'] = False
+        msg = "0"
         if valid:
-            #ret, err =  locate(result, status)
-            pass
-        # ================ write to data.json
-        # write_json(data_path, ret)
-        # ============== Detect Hazard Entry
-        msg = ""
-        #if isInArea(status, ret):
-            # msg = "SERVER REPLY ALERT"
+            #if (None not in result.values()) and (None not in status.values()):
+                # ret =  locate(result, status)
+                # ================ write to data.json
+                # write_json(data_path, ret)
+                # ============== Detect Hazard Entry
+                #if isInArea(status, ret):
+                    # msg = "1"
         c.send(msg)
         c.close()
     # should never get here
