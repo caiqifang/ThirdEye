@@ -5,7 +5,6 @@ import numpy as np
 
 set_path = '/../static/set.json'
 data_path = '/../static/data.json'
-num_device = None
 host = 'localhost' # Get local machine name
 port = 3838        # Reserve a port for your service.
 
@@ -21,7 +20,7 @@ def calc_error(num_device, matrix, obj, ini):
         e = e + (cal_dis - matrix[num_device-1][i])**2
     return e
 
-def locate(d_matrix, obj):
+def locate(result, setting, status):
     scale = calc_dis(obj['anchors_list'][0]['left'],
                      obj['anchors_list'][0]['top'],
                      obj['anchors_list'][1]['left'],
@@ -62,6 +61,7 @@ def locate(d_matrix, obj):
         cnt = cnt +1
         if cnt > 150:
             break
+    # return (x, y) pixal location
     return ini, error
 
 # ============ FILE IO
@@ -73,6 +73,7 @@ def load_json(path):
     return json.loads(string)
 
 def write_json(path, msg):
+    # input: msg is a (x,y) tuple
     curr_path = os.getcwd()
     wr = open(curr_path + path, 'w')
     data = {'x': msg[0], 'y': msg[1]}
@@ -81,8 +82,18 @@ def write_json(path, msg):
     return
 
 # =====================  COMMAND PARSING
-def
+def parse(msg, status):
+    ret = {}
+    return ret
 
+def reset(status):
+    status['num_beacon'] = None
+    status['num_device'] = None
+    status['last_point'] = None
+    status['scale'] = None
+    status['reset'] = True
+    status['setting'] = None
+    status['area'] = None
 
 
 def main():
@@ -90,19 +101,23 @@ def main():
     server.bind((host, port))        # Bind to the port
     server.listen(5)                 # Now wait for client connection.
     status = {}                      # system status
+    reset(status)
+    valid = False
     while True:
         c, addr = server.accept()     # Establish connection with client.
-        print 'Got connection from', addr, time.ctime()
+        print 'Got connection from ', addr, time.ctime()
         client_msg = c.recv(1024)
-        print 'Message:' , client_msg
         # ============ parse client message
-
+        valid, result = parse(client_msg, status)
         # localization calculation ==========
-        #print d_matrix
-        #obj = load_json(set_path) # load setting
-        #ret, err =  locate(d_matrix, obj)        # return (x, y) pixal location
-        # write to data.json
-        #write_json(data_path, ret)
+        if status['reset']:
+            status['setting'] = load_json(set_path) # load setting
+            status['reset'] = False
+        if valid:
+            #ret, err =  locate(result, status)
+            pass
+        # ================ write to data.json
+        # write_json(data_path, ret)
 
         msg = "SERVER REPLY"
         c.send(msg)
