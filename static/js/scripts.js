@@ -152,9 +152,9 @@ window.onload = function(){
     // ==============   GET CALLBACK ===========
     // loading data from data.json
     function load_data(obj){
-        var json_real = JSON.parse(obj.responseText);
-        json_data.x = json_real.x;
-        json_data.y = json_real.y;
+        var json_rly = JSON.parse(obj.responseText);
+        json_data.x = json_rly.x;
+        json_data.y = json_rly.y;
     }
 
     // loading set from json
