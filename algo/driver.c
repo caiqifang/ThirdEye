@@ -8,6 +8,7 @@
 #include <netdb.h>
 
 #define MAX_SIZE 1024
+#define MIN_SIZE 256
 
 void error(const char *msg)
 {
@@ -18,15 +19,18 @@ void error(const char *msg)
 
 // TODO: collecting DW information and put into buffer
 void pull_info(char *buffer){
+    memset(buffer, 0, MAX_SIZE);
     // change this test
     fgets(buffer,255,stdin);
 }
 
-void send_info(char *msg, int argc, char *argv[]){
+// TODO: area alert
+
+void send_info(char *msg, int argc, char *argv[], char *reply){
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
-    char re[256];
+    memset(reply, 0, MIN_SIZE);
     if (argc < 3) {
         fprintf(stderr,"usage %s hostname port\n", argv[0]);
         exit(0);
@@ -51,11 +55,10 @@ void send_info(char *msg, int argc, char *argv[]){
     n = write(sockfd, msg, MAX_SIZE);
     if (n < 0)
         error("ERROR writing to socket");
-    bzero(re,256);
-    n = read(sockfd, re, 255);
+    n = read(sockfd, reply, 255);
     if (n < 0)
         error("ERROR reading from socket");
-    printf("Return message: %s\n", re);
+    printf("Return message: %s\n", reply);
     close(sockfd);
     return;
 }
@@ -63,13 +66,16 @@ void send_info(char *msg, int argc, char *argv[]){
 
 int main(int argc, char *argv[])
 {
-    char *buffer;
+    char *buffer, *reply;
     buffer = (char *) malloc(MAX_SIZE);
+    reply = (char *) malloc(256);
     while(1){
         pull_info(buffer);
-        send_info(buffer, argc, argv);
+        send_info(buffer, argc, argv, reply);
+        // TODO: process server reply, might have to fire alert to tag
     }
     free(buffer);
+    free(reply);
 }
 
 

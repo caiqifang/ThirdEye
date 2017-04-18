@@ -3,6 +3,7 @@ import socket
 import time, json, os, random, math, sys
 import numpy as np
 
+area_path = '/../static/area.json'
 set_path = '/../static/set.json'
 data_path = '/../static/data.json'
 host = 'localhost' # Get local machine name
@@ -12,7 +13,7 @@ def calc_dis(x1, y1, x2, y2):
     ans = math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)
     return math.sqrt(ans)
 
-def calc_error(num_device, matrix, obj, ini):
+def calc_error(num_device, num_tag, dmatrix, setting, point):
     e = 0
     for i in range(num_device -1):  # if more tags,  change HERE!
         cal_dis = calc_dis(obj['anchors_list'][i]['left'],
@@ -118,8 +119,10 @@ def main():
             pass
         # ================ write to data.json
         # write_json(data_path, ret)
-
-        msg = "SERVER REPLY"
+        # ============== Detect Hazard Entry
+        msg = ""
+        #if isInArea(status, ret):
+            # msg = "SERVER REPLY ALERT"
         c.send(msg)
         c.close()
     # should never get here
