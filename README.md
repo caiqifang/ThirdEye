@@ -39,12 +39,19 @@ password: pi
 DecaWave Code
 -------------
 
-1 tag 4 beacon code: dw1000_api_rev2p03/examples/myRanging/
+### Raspberry Pi API
+1 tag 4 beacon code: DecaWaveAPI_RPi/examples/myRanging/
 
 Use Makefile to compile
 
-RPi specific code: dw1000_api_rev2p03/myPlatform
+RPi specific code: DecaWaveAPI_RPi/myPlatform
 
+### NRF52 DK API
+2 way ranging algorithm: DecaWaveAPI_nRF/[initiator.cpp, responder.cpp]
+
+Import the project into MBED COMPILER to compile, or use Makefile locally (gcc-arm-none-eabi is needed)
+
+nRF52 specific code: DecaWaveAPI-nRF/decaAPI/[some files] 
 
 Data Transmit
 --------------------
