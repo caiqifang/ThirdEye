@@ -32,7 +32,7 @@ window.onload = function(){
     // background image
     var imgElement = document.getElementById('my-image');
     var imgInstance = new fabric.Image(imgElement, {
-        opacity: 0.85,
+        opacity: 0.5,
         hasControls: false,
         lockMovementY: true,
         lockMovementX: true,
