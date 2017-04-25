@@ -35,7 +35,7 @@ window.onload = function(){
     // background image
     var imgElement = document.getElementById('my-image');
     var imgInstance = new fabric.Image(imgElement, {
-        opacity: 0.4,
+        opacity: 0.35,
         hasControls: false,
         lockMovementY: true,
         lockMovementX: true,
@@ -156,6 +156,7 @@ window.onload = function(){
         json_set.max_width = lefts[json_set.num_anchors - 1] - lefts[0];
         json_set.max_height = tops[json_set.num_anchors - 1] - tops[0];
         postJSON('/set', new_set);
+        postJSON('/area', new_area);
     }
 
     function anchors_click(){
@@ -186,6 +187,16 @@ window.onload = function(){
 
     function area_click(){
         // create hazard area
+        var rec = new fabric.Rect({
+            left: x,
+            opacity: 0.6,
+            top: y,
+            fill: 'red',
+            width: 100,
+            height: 100,
+        });
+        json_area = rec;
+        canvas.add(json_area);
         document.getElementById('console').innerHTML = 'Set Area';
         canvas.renderAll();
     }
@@ -199,7 +210,7 @@ window.onload = function(){
             originX:'center',
             left: x,
             top: y,
-            fill: 'red',
+            fill: 'green',
             width: 10,
             height: 10,
             lockScalingX: true,

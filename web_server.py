@@ -14,6 +14,7 @@ def new_data():
         data_path = "/static/data.json"
         wr = open(curr_path + data_path, 'w')
         wr.write(json.dumps(j))
+        print json.dumps(j)
         wr.close()
     return "Record New Data"
 
@@ -37,6 +38,7 @@ def new_area():
         data_path = "/static/area.json"
         wr = open(curr_path + data_path, 'w')
         wr.write(json.dumps(j))
+        print json.dumps(j)
         wr.close()
     return "Record new area"
 
