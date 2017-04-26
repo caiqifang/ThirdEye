@@ -24,6 +24,8 @@ void pull_info(char *buffer){
     fgets(buffer,255,stdin);
 }
 
+// TODO: area alert
+
 void send_info(char *msg, int argc, char *argv[], char *reply){
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
     while(1){
         pull_info(buffer);
         send_info(buffer, argc, argv, reply);
+        // TODO: process server reply, might have to fire alert to tag
     }
     free(buffer);
     free(reply);
