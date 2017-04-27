@@ -87,47 +87,80 @@ def load_json(path):
     return json.loads(string)
 
 def write_json(path, pts):
-    # input: pts is a list of (x,y) tuple   [(x,y), (x,y)]
     curr_path = os.getcwd()
     wr = open(curr_path + path, 'w')
-    data = {}
-    for i in len(pts):
-        data[i] = pts[i]
-    wr.write(json.dumps(data))
+    wr.write(json.dumps(pts))
     wr.close()
     return
 
-# =====================  COMMAND PARSING  TODO
 def parse(msg, status):
+    valid = True
+    obj = status['setting']
+    result = {}
     result['num_device'] = None
     result['num_tag'] = None
-    result['distance'] = None
+    result['distance'] = {}
+    list_str = msg.split(',')
+    scale = []
+    for string in list_str:
+        data = string.split(':')
+        if int(data[0]) == 777:
+            result['num_device'] = int(data[3])
+            result['num_tag'] = int(data[2])
+            if int(data[1]) == 0:
+                #parsing beacon to beacon
+                scale.append(calc_dis(obj['anchors_list'][data[4]]['left'],
+                     obj['anchors_list'][data[4]]['top'],
+                     obj['anchors_list'][data[5]]['left'],
+                     obj['anchors_list'][data[5]]['top']) / float(data[6]))
+                # get scale
+                status['scale'] = sum(scale) / float(len(scale))
 
-    #parsing beacon to beacon
-    scale = calc_dis(obj['anchors_list'][0]['left'],
-                     obj['anchors_list'][0]['top'],
-                     obj['anchors_list'][1]['left'],
-                     obj['anchors_list'][1]['top']) / d_matrix[0][1]
-        # get scale
-
-    #parsing beacon to tag
-        # get distance matrix
-
-    #parsing reset
-    valid = False
-    ret = {}
-    return valid, ret
+            elif int(data[1]) == 5:
+                if status['scale'] != None:
+                    #parsing beacon to tag
+                    tag = int(data[4])
+                    beacon = int(data[5])
+                    tag = max(tag, beacon)
+                    beacon = min(tag, beacon)
+                    result['distance'][str(tag)] = {}
+                    result['distance'][str(tag)][str(beacon)] = float(data[6]) * status['scale']
+                else:
+                    valid = False
+                    print 'no scale data! ERROR'
+            else:
+                valid = False          #system reset
+    #parsing validating
+    if valid:
+        if len(result['distance'].keys()) != result['num_tag']:
+            valid = False
+            print 'not valid data'
+        else:
+            for key in result['distance'].keys():
+                if len(result['distance'][key].keys()) != result['num_device']:
+                    valid = False
+                    print 'not valid data'
+    return valid, result
 
 def isInArea(status, points):
-    # as for now, assume single tags
+    msg = ""
     area = status['area']
     height = area['height']*area['scaleY']
     width = area['scaleX']*area['width']
-    y = area['top']
-    x = area['left']
-
-
-    return False
+    top = area['top']
+    left = area['left']
+    for i in points:
+        dis_x = points[i]['x']
+        dis_y = points[i]['y']
+        msg += i
+        msg += ':'
+        if (dis_x >= left and dis_x <= (left+width)
+                and dis_y >= top and dis_y <= (top+height)):
+            msg += '1'
+        else:
+            msg += '0'
+        msg += ','
+    return msg[:-1]
 
 def reset(status):
     status['last_point'] = None
@@ -158,8 +191,7 @@ def main():
                         # write to data.json
                         write_json(data_path, ret)
                         # Detect Alert
-                        if isInArea(status, ret):
-                            msg = "1"
+                        msg = isInArea(status, ret):
                     c.send(msg)
                     client_msg = c.recv(1024)
             except:
