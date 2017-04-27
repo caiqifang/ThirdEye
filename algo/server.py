@@ -118,19 +118,22 @@ def parse(msg, status):
     ret = {}
     return valid, ret
 
-# ==================  TODO detect area
-
 def isInArea(status, points):
+    # as for now, assume single tags
+    area = status['area']
+    height = area['height']*area['scaleY']
+    width = area['scaleX']*area['width']
+    y = area['top']
+    x = area['left']
 
-    pass
+
+    return False
 
 def reset(status):
     status['last_point'] = None
     status['scale'] = None
-    status['reset'] = True
-    status['setting'] = None
-    status['area'] = None
-
+    status['setting'] = load_json(set_path)
+    status['area'] = load_json(area_path)
 
 def main():
     server = socket.socket()         # Create a socket object
@@ -146,29 +149,21 @@ def main():
             try:
                 client_msg = c.recv(1024)
                 while True:
-                    # ============ parse client message
-                    # valid, result = parse(client_msg, status)
-                    # localization calculation ==========
-                    if status['reset']:
-                        reset(status)
-                        status['setting'] = load_json(set_path)
-                        status['area'] = load_json(area_path)
-                        status['reset'] = False
-                    msg = "0"  # check alert
+                    # parse client message
+                    valid, result = parse(client_msg, status)
+                    # localization calculation
+                    msg = ""
                     if valid:
-                        pass
-                        #if (None not in result.values()) \
-                            # and (None not in status.values()):
-                            # ret =  locate(result, status)
-                            # ================ write to data.json
-                            # write_json(data_path, ret)
-                            # ============== Detect Hazard Entry
-                            #if isInArea(status, ret):
-                                # msg = "1"
+                        ret = locate(result, status)
+                        # write to data.json
+                        write_json(data_path, ret)
+                        # Detect Alert
+                        if isInArea(status, ret):
+                            msg = "1"
                     c.send(msg)
                     client_msg = c.recv(1024)
             except:
-                print 'client socket receive error, socket close'
+                print 'client socket and calculation error -  socket close'
                 c.close()
         except:
             print 'Cant Accept Connection'

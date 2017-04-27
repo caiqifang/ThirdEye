@@ -27,8 +27,10 @@ void pull_info(char *buffer){
 }
 
 // TODO: send out alert to tags
-// server return char* reply == "0" -> no alert
-// server return char* reply == "1" -> has alert
+// char* reply in the format of "ID:0 or 1,ID:0 or 1,..." comma seperated string
+// "0" -> no alert
+// "1" -> has alert
+// Default reply -> ""   empty string, no need to process
 void send_alert(char* reply){
     size_t str_len = MIN_SIZE;
     // TODO: implement this function
