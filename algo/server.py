@@ -62,7 +62,7 @@ def locate(result, status):
     num_device = result['num_device']
     num_tag = result['num_tag']
     point = []
-    if status['last_point'] = None:
+    if status['last_point'] == None:
         #first start
         corner = (status['setting']['bound_left'], status['setting']['bound_top'])
         max_bound =(status['setting']['max_width'], status['setting']['max_height'])
@@ -140,28 +140,38 @@ def main():
     reset(status)
     valid = False
     while True:
-        c, addr = server.accept()     # Establish connection with client.
-        print 'Got connection from ', addr, time.ctime()
-        client_msg = c.recv(1024)
-        # ============ parse client message
-        valid, result = parse(client_msg, status)
-        # localization calculation ==========
-        if status['reset']:
-            reset(status)
-            status['setting'] = load_json(set_path)
-            status['area'] = load_json(area_path)
-            status['reset'] = False
-        msg = "0"
-        if valid:
-            #if (None not in result.values()) and (None not in status.values()):
-                # ret =  locate(result, status)
-                # ================ write to data.json
-                # write_json(data_path, ret)
-                # ============== Detect Hazard Entry
-                #if isInArea(status, ret):
-                    # msg = "1"
-        c.send(msg)
-        c.close()
+        try:
+            c, addr = server.accept()     # Establish connection with client.
+            print 'Got connection from ', addr, time.ctime()
+            try:
+                client_msg = c.recv(1024)
+                while True:
+                    # ============ parse client message
+                    # valid, result = parse(client_msg, status)
+                    # localization calculation ==========
+                    if status['reset']:
+                        reset(status)
+                        status['setting'] = load_json(set_path)
+                        status['area'] = load_json(area_path)
+                        status['reset'] = False
+                    msg = "0"  # check alert
+                    if valid:
+                        pass
+                        #if (None not in result.values()) \
+                            # and (None not in status.values()):
+                            # ret =  locate(result, status)
+                            # ================ write to data.json
+                            # write_json(data_path, ret)
+                            # ============== Detect Hazard Entry
+                            #if isInArea(status, ret):
+                                # msg = "1"
+                    c.send(msg)
+                    client_msg = c.recv(1024)
+            except:
+                print 'client socket receive error, socket close'
+                c.close()
+        except:
+            print 'Cant Accept Connection'
     # should never get here
     server.close()
 
