@@ -51,7 +51,7 @@ RPi specific code: DecaWaveAPI_RPi/myPlatform
 
 Import the project into MBED COMPILER to compile, or use Makefile locally (gcc-arm-none-eabi is needed)
 
-nRF52 specific code: DecaWaveAPI-nRF/decaAPI/[some files] 
+nRF52 specific code: DecaWaveAPI-nRF/decaAPI/[some files]
 
 Data Transmit
 --------------------
@@ -77,6 +77,10 @@ Valid:Type:TagNum:BeaconNum:pointA:pointB:Value
 
     example: 777:5:1:4:0:4:12.3444
 
+Start program order:
+UI / finish start
+server.py
+driver.c
 
 
 
