@@ -149,6 +149,8 @@ def isInArea(status, points):
     width = area['scaleX']*area['width']
     top = area['top']
     left = area['left']
+    keys = points.keys()
+    num_tag = len(points)
     for i in points:
         dis_x = points[i]['x']
         dis_y = points[i]['y']
@@ -187,13 +189,17 @@ def main():
                     # valid, result = parse(client_msg, status)
                     # localization calculation
                     msg = "6:1"
+                    print 'Server: client_msg:\n', client_msg
+                    """
                     if False: #valid:
                         ret = locate(result, status)
                         # write to data.json
                         write_json(data_path, ret)
                         # Detect Alert
                         msg = isInArea(status, ret)
+                    """
                     c.send(msg)
+                    print 'Server: receiving new message'
                     client_msg = c.recv(1024)
             except:
                 print 'client socket and calculation error -  socket close'
