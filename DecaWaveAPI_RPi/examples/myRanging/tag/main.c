@@ -59,6 +59,10 @@ static uint8 rx_invite_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, Hub_ID, 0, 0x12
 static uint8 tx_register_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, Hub_ID, 0, MY_ID, 0, 0x13, 0, 0};
 static uint8 rx_ack_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x14, 0, 0};
 static uint8 rx_twr_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x20, 0, 0};
+//Alert msg
+#define ALERT_VAL 8
+static uint8 rx_alert_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x25, 0, 0};
+
 #define TWR_MSG_TGT_IDX 6
 // static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0x21, 0, 0};
 // static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0x10, 0x02, 0, 0, 0, 0};
@@ -129,6 +133,14 @@ void printMsg(uint8 msg[], size_t size) {
     printf("\n");
 }
 
+void alert(int i) {
+    if (i == 1) {
+        printf("Turn on alert!!!\n");
+    }
+    else {
+        printf("Turn off alert \n");
+    }
+}
 void doRanging(uint16 beacon_id) {
     /* Set expected response's delay and timeout. See NOTE 4, 5 and 6 below.
      * As this example only handles one incoming frame with always the same delay and timeout, those values can be set here once for all. */
@@ -381,6 +393,17 @@ int main(void)
                 doRanging(target);
                 break;
             }
+            //turn on alert!
+            rx_buffer[ALERT_VAL] = 1;
+            if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
+                alert(1);
+            }
+            //turn off alert
+            rx_buffer[ALERT_VAL] = 0;
+            if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
+                alert(0);
+            }
+
         }
         /*
         while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_ERR)))

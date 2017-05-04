@@ -45,7 +45,7 @@ static uint8 tx_init_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, MY_ID, 0, 0x11, 0
 #define TWR_MSG_TGT_IDX 6
 
 #define MSG_ALERTTAG_IDX 5
-#define MSG_ALERTVAL_IDX 6
+#define MSG_ALERTVAL_IDX 8
     
 static uint8 tx_invite_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, MY_ID, 0, 0x12, 0, 0};
 static uint8 rx_register_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, 0, 0, 0x13, 0, 0};
