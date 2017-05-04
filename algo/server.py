@@ -7,6 +7,7 @@ set_path = '/../static/set.json'
 data_path = '/../static/data.json'
 host = 'localhost' # Get local machine name
 port = 3838        # Reserve a port for your service.
+alert_dic = 3.0    # tag to tag distance alert
 
 def calc_dis(x1, y1, x2, y2):
     ans = math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)
@@ -160,6 +161,7 @@ def isInArea(status, points):
             msg += '0'
         msg += ','
     return msg[:-1]
+# "ID:value,ID:value"
 
 def reset(status):
     status['last_point'] = None
@@ -182,10 +184,10 @@ def main():
                 client_msg = c.recv(1024)
                 while True:
                     # parse client message
-                    valid, result = parse(client_msg, status)
+                    # valid, result = parse(client_msg, status)
                     # localization calculation
-                    msg = ""
-                    if valid:
+                    msg = "6:1"
+                    if False: #valid:
                         ret = locate(result, status)
                         # write to data.json
                         write_json(data_path, ret)
