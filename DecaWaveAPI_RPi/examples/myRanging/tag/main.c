@@ -316,13 +316,15 @@ int main(void)
         while (receiveMsg(0) == 0) {
             uint8 target = rx_buffer[TWR_MSG_TGT_IDX];
             rx_buffer[TWR_MSG_TGT_IDX] = 0;
+            uint8 alertVal = rx_buffer[ALERT_VAL];
+            rx_buffer[ALERT_VAL] = 0;
             if (memcmp(rx_buffer, rx_twr_msg, ALL_MSG_COMMON_LEN) == 0) {
                 printf("Start ranging with %d\n", target);
                 doRanging(target);
                 break;
 
-            } else if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN - 1) == 0) {
-                alert(rx_buffer[ALERT_VAL]);
+            } else if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
+                alert(alertVal);
 
                 // //turn on alert!
                 // rx_buffer[ALERT_VAL] = 1;
