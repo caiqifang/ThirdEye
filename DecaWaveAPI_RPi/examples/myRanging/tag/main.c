@@ -59,11 +59,12 @@ static uint8 rx_invite_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 0, 0, Hub_ID, 0, 0x12
 static uint8 tx_register_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, Hub_ID, 0, MY_ID, 0, 0x13, 0, 0};
 static uint8 rx_ack_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x14, 0, 0};
 static uint8 rx_twr_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x20, 0, 0};
+#define TWR_MSG_TGT_IDX 6
+
 //Alert msg
 #define ALERT_VAL 8
 static uint8 rx_alert_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, MY_ID, 0, Hub_ID, 0, 0x25, 0, 0};
 
-#define TWR_MSG_TGT_IDX 6
 // static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0x21, 0, 0};
 // static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0x10, 0x02, 0, 0, 0, 0};
 // static uint8 tx_final_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0x23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -302,79 +303,6 @@ int main(void)
     
     initLoop();
 
-        // dwt_rxenable(DWT_START_RX_IMMEDIATE);
-        // while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_ERR)))
-        // { };
-        // printf("status_reg %x\n", status_reg);
-
-        // if (status_reg & SYS_STATUS_RXFCG)
-        // {
-        //     uint32 frame_len;
-        //     /* A frame has been received, copy it to our local buffer. */
-        //     frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
-        //     printf("frame_len %d\n", frame_len);
-        //     if (frame_len <= FRAME_LEN_MAX)
-        //     {
-        //         dwt_readrxdata(rx_buffer, frame_len, 0);
-        //     }
-
-        //     /* Clear good RX frame event in the DW1000 status register. */
-        //     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG);
-
-        //     /* Execute a random delay. */
-        //     //deca_sleep(TX_DELAY_MS);
-
-        //     if (memcmp(rx_buffer, rx_invite_msg, ALL_MSG_COMMON_LEN) == 0) {
-        //         int res = dwt_writetxdata(sizeof(tx_register_msg), tx_register_msg, 0); /* Zero offset in TX buffer. */
-
-        //         dwt_writetxfctrl(sizeof(tx_register_msg), 0, 0); /* Zero offset in TX buffer, no ranging. */
-
-        //         /* Start transmission. */
-        //         res = dwt_starttx(DWT_START_TX_IMMEDIATE | DWT_RESPONSE_EXPECTED);
-
-        //         if (ret == DWT_ERROR)
-        //         {
-        //             printf("error\n");
-        //             continue;
-        //         }
-
-        //          Poll for reception of expected "final" frame or error/timeout. See NOTE 8 below. 
-        //         while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
-        //         { };
-        //         printf("status 3: %x\n", status_reg);
-
-        //         if (status_reg & SYS_STATUS_RXFCG)
-        //         {
-        //             /* Clear good RX frame event and TX frame sent in the DW1000 status register. */
-        //             dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG | SYS_STATUS_TXFRS);
-
-        //             /* A frame has been received, read it into the local buffer. */
-        //             frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
-        //             if (frame_len <= RX_BUF_LEN)
-        //             {
-        //                 printf("Frame got\n");
-        //                 dwt_readrxdata(rx_buffer, frame_len, 0);
-        //             }
-
-
-        //             if (memcmp(rx_buffer, rx_ack_msg, ALL_MSG_COMMON_LEN) == 0)
-        //             {
-        //                 break; // successfully registered
-        //             }
-        //         }
-                
-        //     } else {
-        //         // not expected invite msg
-        //     }
-            
-            
-        // }
-        // else
-        // {
-        //     printf("Receive timeout\n");
-        //     /* Clear RX error events in the DW1000 status register. */
-        //     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_ALL_RX_ERR);
-        // }
 
     
 
@@ -392,53 +320,24 @@ int main(void)
                 printf("Start ranging with %d\n", target);
                 doRanging(target);
                 break;
-            }
-            //turn on alert!
-            rx_buffer[ALERT_VAL] = 1;
-            if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
-                alert(1);
-            }
-            //turn off alert
-            rx_buffer[ALERT_VAL] = 0;
-            if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
-                alert(0);
+
+            } else if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN - 1) == 0) {
+                alert(rx_buffer[ALERT_VAL]);
+
+                // //turn on alert!
+                // rx_buffer[ALERT_VAL] = 1;
+                // if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
+                //     alert(1);
+                // }
+                // //turn off alert
+                // rx_buffer[ALERT_VAL] = 0;
+                // if (memcmp(rx_buffer, rx_alert_msg, ALL_MSG_COMMON_LEN) == 0) {
+                //     alert(0);
+                // }
             }
 
         }
-        /*
-        while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_ERR)))
-        { };
-        printf("status_reg %x\n", status_reg);
-
-        if (status_reg & SYS_STATUS_RXFCG)
-        {
-            uint32 frame_len;
-            // A frame has been received, copy it to our local buffer.
-            frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
-            printf("frame_len %d\n", frame_len);
-            if (frame_len <= RX_BUF_LEN)
-            {
-                dwt_readrxdata(rx_buffer, frame_len, 0);
-            }
-
-            // Clear good RX frame event in the DW1000 status register.
-            dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG);
-
-            uint8 target = rx_buffer[TWR_MSG_TGT_IDX];
-            rx_buffer[TWR_MSG_TGT_IDX] = 0;
-            if (memcmp(rx_buffer, rx_twr_msg, ALL_MSG_COMMON_LEN) == 0) {
-                doRanging(target);
-            }
-
-        */
-        // int i;
-        // for (i = 0; i < NUMBER_OF_BEACONS; i++) {
-        //     printf("------- talk to ID %d -------\n", Beacon_IDs[i]);
-        //     doRanging(Beacon_IDs[i]);
-        // }
-        // /* Execute a delay between ranging exchanges. */
-        // sleep_ms(RNG_DELAY_MS);
-        //}
+        
     }
 
 }
