@@ -93,7 +93,7 @@ def write_json(path, pts):
     wr.close()
     return
 
-def parse(msg, status):
+def parse(msg, status, beacon_dis):
     valid = True
     obj = status['setting']
     result = {}
@@ -101,20 +101,19 @@ def parse(msg, status):
     result['num_tag'] = None
     result['distance'] = {}
     list_str = msg.split(',')
-    scale = []
     for string in list_str:
         data = string.split(':')
         if int(data[0]) == 777:
             result['num_device'] = int(data[3])
             result['num_tag'] = int(data[2])
-            if int(data[1]) == 0:
+            if status['scale'] == None:
                 #parsing beacon to beacon
-                scale.append(calc_dis(obj['anchors_list'][data[4]]['left'],
-                     obj['anchors_list'][data[4]]['top'],
-                     obj['anchors_list'][data[5]]['left'],
-                     obj['anchors_list'][data[5]]['top']) / float(data[6]))
+                scale = calc_dis(obj['anchors_list']['3']['left'],
+                     obj['anchors_list']['3']['top'],
+                     obj['anchors_list']['5']['left'],
+                     obj['anchors_list']['5']['top']) / beacon_dis
                 # get scale
-                status['scale'] = sum(scale) / float(len(scale))
+                status['scale'] = scale
 
             elif int(data[1]) == 5:
                 if status['scale'] != None:
@@ -150,7 +149,6 @@ def isInArea(status, points):
     top = area['top']
     left = area['left']
     keys = points.keys()
-    num_tag = len(points)
     for i in points:
         dis_x = points[i]['x']
         dis_y = points[i]['y']
@@ -171,13 +169,14 @@ def reset(status):
     status['setting'] = load_json(set_path)
     status['area'] = load_json(area_path)
 
-def main():
+def main(argv):
     server = socket.socket()         # Create a socket object
     server.bind((host, port))        # Bind to the port
     server.listen(5)                 # Now wait for client connection.
     status = {}                      # system status
     reset(status)
     valid = False
+    beacon_dis = float(argv[0])
     while True:
         try:
             c, addr = server.accept()     # Establish connection with client.
@@ -185,21 +184,21 @@ def main():
             try:
                 client_msg = c.recv(1024)
                 while True:
-                    # parse client message
-                    # valid, result = parse(client_msg, status)
-                    # localization calculation
-                    msg = "6:1"
                     print 'Server: client_msg:\n', client_msg
-                    """
-                    if False: #valid:
+                    # parse client message
+                    valid, result = parse(client_msg[1:], status, beacon_dis)
+                    # localization calculation
+                    msg = "6:0"
+                    if valid:
                         ret = locate(result, status)
                         # write to data.json
                         write_json(data_path, ret)
                         # Detect Alert
                         msg = isInArea(status, ret)
-                    """
+                    else:
+                        print 'Server: invalid information'
                     c.send(msg)
-                    print 'Server: receiving new message'
+                    print 'Server: waiting new message'
                     client_msg = c.recv(1024)
             except:
                 print 'client socket and calculation error -  socket close'
@@ -210,4 +209,4 @@ def main():
     server.close()
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
