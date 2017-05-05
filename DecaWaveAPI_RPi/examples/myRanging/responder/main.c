@@ -164,7 +164,7 @@ int main(void)
 
         if (status_reg & SYS_STATUS_RXFCG)
         {
-            printf("Got something\n");
+            //printf("Got something\n");
             uint32 frame_len;
             uint8 target_id;
             /* Clear good RX frame event in the DW1000 status register. */
@@ -174,7 +174,7 @@ int main(void)
             frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFL_MASK_1023;
             if (frame_len <= RX_BUFFER_LEN)
             {
-                printf("Got frame len %d\n", frame_len);
+                //printf("Got frame len %d\n", frame_len);
                 dwt_readrxdata(rx_buffer, frame_len, 0);
             }
 
@@ -220,13 +220,13 @@ int main(void)
                 /* Poll for reception of expected "final" frame or error/timeout. See NOTE 8 below. */
                 while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
                 { };
-                printf("status 3: %x\n", status_reg);
+                //printf("status 3: %x\n", status_reg);
                 /* Increment frame sequence number after transmission of the response message (modulo 256). */
                 frame_seq_nb++;
 
                 if (status_reg & SYS_STATUS_RXFCG)
                 {
-                    printf("Final frame\n");
+                    //printf("Final frame\n");
                     /* Clear good RX frame event and TX frame sent in the DW1000 status register. */
                     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG | SYS_STATUS_TXFRS);
 
@@ -234,7 +234,7 @@ int main(void)
                     frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
                     if (frame_len <= RX_BUF_LEN)
                     {
-                        printf("Final frame got\n");
+                        //printf("Final frame got\n");
                         dwt_readrxdata(rx_buffer, frame_len, 0);
                     }
 
