@@ -137,7 +137,7 @@ void printMsg(uint8 msg[], size_t size) {
 
 void alert(int i) {
     if (i == 1) {
-        buzzer.period_ms(2.0f);      // 4 second period
+        buzzer.period_ms(1.5f);      // 4 second period
         buzzer.write(0.50f);      // 50% duty cycle, relative to period
     }
     else {
@@ -165,7 +165,7 @@ void doRanging(uint16 beacon_id) {
 
     /* We assume that the transmission is achieved correctly, poll for reception of a frame or error/timeout. See NOTE 9 below. */
     while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
-    { 
+    {
         ;
     }
 
@@ -203,7 +203,7 @@ void doRanging(uint16 beacon_id) {
             /* Compute final message transmission time. See NOTE 10 below. */
             final_tx_time = (resp_rx_ts + (RESP_RX_TO_FINAL_TX_DLY_UUS * UUS_TO_DWT_TIME)) >> 8;
             //final_tx_time = (resp_rx_ts + (RESP_RX_TO_FINAL_TX_DLY_UUS)) >> 8;
-            
+
             dwt_setdelayedtrxtime(final_tx_time);
 
             /* Final TX timestamp is the transmission time we programmed plus the TX antenna delay. */
@@ -283,7 +283,7 @@ int main(void)
 {
     buzzer.write(0.00f);      // 50% duty cycle, relative to period
     openspi();
-    
+
 
     if (dwt_initialise(DWT_LOADUCODE) == DWT_ERROR)
     {
@@ -294,7 +294,7 @@ int main(void)
     /* Configure DW1000. See NOTE 3 below. */
     dwt_configure(&config);
     //printf("DW configure succeeds\n");
-    
+
     set_spi_rate_high();
 
     /* Apply default antenna delay value. See NOTE 1 below. */
@@ -304,11 +304,11 @@ int main(void)
     //dwt_setrxtimeout(RESP_RX_TIMEOUT_UUS);
 
     //printf("------- Init loop ------\n");
-    
+
     initLoop();
 
 
-    
+
 
     //printf("------- Enter ranging loop ------\n");
 
@@ -343,7 +343,7 @@ int main(void)
             }
 
         }
-        
+
     }
 
 }
